@@ -17,9 +17,8 @@ ACCOUNT_ID    = int(os.getenv("ACCOUNT_ID"))
 
 HEARTBEAT_INTERVAL = 10
 
-# Payload types como enteros (protobuf 7.x)
-PT_APP_AUTH_REQ    = 2100
-PT_APP_AUTH_RES    = 2101
+PT_APP_AUTH_REQ     = 2100
+PT_APP_AUTH_RES     = 2101
 PT_ACCOUNT_AUTH_REQ = 2102
 PT_ACCOUNT_AUTH_RES = 2103
 PT_EXECUTION_EVENT  = 2126
@@ -101,10 +100,22 @@ class CTraderClient:
                 print("✗ Conexión cerrada por el servidor")
                 self._running = False
 
+    async def disconnect(self):
+        self._running = False
+        if self.writer:
+            self.writer.close()
+            await self.writer.wait_closed()
+        print("\n✓ Desconectado limpiamente")
+
     async def run(self):
-        await self.connect()
-        await self.authenticate_app()
-        await asyncio.gather(
-            self.listen(),
-            self._heartbeat()
-        )
+        try:
+            await self.connect()
+            await self.authenticate_app()
+            await asyncio.gather(
+                self.listen(),
+                self._heartbeat()
+            )
+        except asyncio.CancelledError:
+            pass
+        finally:
+            await self.disconnect()
