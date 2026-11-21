@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "ctrader-async"
+version = "0.1.0"
+description = "Minimal asyncio-based Python client for the cTrader Open API"
+requires-python = ">=3.12"
+dependencies = [
+    "protobuf>=7.0",
+    "python-dotenv",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ctrader_async*"]
